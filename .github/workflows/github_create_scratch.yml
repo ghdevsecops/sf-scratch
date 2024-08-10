@@ -57,8 +57,8 @@ jobs:
         id: snapscratch
         if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'true' && github.event.inputs.source_org_id != '' && github.event.inputs.snapshot_name != '' }}
         run: |
-          touch project-snapshot-scratch-def.json
-          echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > project-snapshot-scratch-def.json
+          touch config/project-snapshot-scratch-def.json
+          echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > config/project-snapshot-scratch-def.json
           cat config/project-snapshot-scratch-def.json
           
           
