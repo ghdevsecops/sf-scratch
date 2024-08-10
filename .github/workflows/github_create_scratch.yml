@@ -68,6 +68,7 @@ jobs:
           }
           while true; do
             getStatus="$(orgGetSnapshotStatus)"
+            echo $getStatus
             if [[ "$getStatus" == "Active" ]]; then
                 echo "Snapshot Creation: SUCCESS."
                 break
