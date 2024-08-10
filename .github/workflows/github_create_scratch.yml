@@ -68,8 +68,8 @@ jobs:
         id: genpwd
         if: ${{ steps.scratch.outcome == 'success' || steps.snapscratch.outcome == 'success' }}
         run: | 
-          sf org generate password --target-org ${{ github.event.inputs.alias }}
-          sf org display user --target-org ${{ github.event.inputs.alias }} | tee -a scratch-org-info.txt
+          sf org generate password --target-org ${{ github.event.inputs.scratch_alias }}
+          sf org display user --target-org ${{ github.event.inputs.scratch_alias }} | tee -a scratch-org-info.txt
           sf org logout --all --no-prompt
 
       - name: Store Scratch Org Information as Artifact
