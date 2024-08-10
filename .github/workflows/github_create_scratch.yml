@@ -2,22 +2,6 @@ name: Create Scratch
 on: 
   workflow_dispatch:
       inputs:
-        based_on_snapshot:
-          description: Create Scratch Org based on Snapshot
-          required: true
-          type: boolean
-          default: false
-        source_org_id:
-          description: Source Org ID
-          type: string
-          required: true
-        snapshot_name:
-          description: Snapshot Name
-          type: string
-          required: true
-        snapshot_description:
-          description: Snapshot Description
-          type: string
         scratch_alias:
           description: Scratch Alias
           required: true
@@ -31,6 +15,20 @@ on:
           type: number
           default: 30
           required: true
+        based_on_snapshot:
+          description: Create Scratch Org based on Snapshot
+          required: true
+          type: boolean
+          default: false
+        source_org_id:
+          description: Source Org ID
+          type: string
+        snapshot_name:
+          description: Snapshot Name
+          type: string
+        snapshot_description:
+          description: Snapshot Description
+          type: string
         
 jobs:
   create_scratch:
