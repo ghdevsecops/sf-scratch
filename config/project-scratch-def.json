@@ -1,6 +1,5 @@
 {
-  "orgName": "codespace company",
-  "edition": "Developer",
+  "sourceorg": "00D5g00000KXQUq",
   "features": ["EnableSetPasswordInApi"],
   "settings": {
     "lightningExperienceSettings": {

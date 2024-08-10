@@ -1,0 +1,21 @@
+name: Create Scratch
+on: 
+  workflow_dispatch:
+      inputs:
+        scratch_name:
+          description: Provide name for the scratch org
+          required: true
+        scratch_alias:
+          description: Alias for the scratch org.
+          required: true
+        duration_days:
+          description: Number of days before the scratch_aliascratch expires
+          default: '30'
+          required: true
+        description:
+          description: Description of the scratch org
+        email:
+          description: Email address that will be applied to the org's admin user
+          required: true
+
+        
