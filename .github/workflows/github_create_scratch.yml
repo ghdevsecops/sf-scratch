@@ -64,7 +64,7 @@ jobs:
           
           #!/bin/bash
           orgGetSnapshotStatus() {
-            sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} jq -r '.result.Status'
+            sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --json | jq -r '.result.Status'
           }
           while true; do
             getStatus=$(orgGetSnapshotStatus)
