@@ -63,7 +63,6 @@ jobs:
           sf org create snapshot --source-org ${{ github.event.inputs.source_org_id }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --name ${{ github.event.inputs.snapshot_name }} --description "${{ github.event.inputs.snapshot_description }}"
           
           #!/bin/bash
-          rerunInterval = 60
           orgGetSnapshotStatus() {
             sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} jq -r '.result.Status'
           }
@@ -77,7 +76,7 @@ jobs:
               exit 1
             else
             echo "Snapshot Creation: IN PROGRESS"
-              sleep $rerunInterval
+              sleep 60
             fi
           done
 
