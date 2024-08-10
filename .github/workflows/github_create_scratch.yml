@@ -35,7 +35,7 @@ jobs:
           sf org generate password --target-org ${{ github.event.inputs.alias }}
           sf org display user --target-org ${{ github.event.inputs.alias }} | tee -a scratch-org-info.txt
           sf org logout --all --no-prompt
-      - name: Store Scratch Org Details as Artifact
+      - name: Store Scratch Org Information as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Store Scratch Org Info
