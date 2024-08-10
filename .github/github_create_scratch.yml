@@ -2,20 +2,50 @@ name: Create Scratch
 on: 
   workflow_dispatch:
       inputs:
-        scratch_name:
-          description: Provide name for the scratch org
+        name:
+          description: Provide name for scratch org | TomCruiseScratch
           required: true
-        scratch_alias:
-          description: Alias for the scratch org.
+        # username:
+        #   description: Provide Username for scratch org | tom.cruise@mckesson.com.scratch
+        #   required: true
+        alias:
+          description: Provide alias for scratch org | tcscratch
           required: true
-        duration_days:
-          description: Number of days before the scratch_aliascratch expires
-          default: '30'
-          required: true
-        description:
-          description: Description of the scratch org
         email:
           description: Email address that will be applied to the org's admin user
           required: true
-
+        description:
+          description: Provide Description
+        duration_days:
+          description: Number of days before scratch org expires
+          default: '30'
+          required: true
+        
+jobs:
+  create_scratch:
+    name: Create Scratch based on Org Shape
+    runs-on: ubuntu-latest
+    container:
+      image: salesforce/cli:latest-full
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Authorize DevHub
+        run: |
+          echo ${{ secrets.SFDX_AUTHURL_PDEVHUB }} | sf org login sfdx-url --sfdx-url-stdin
+      - name: Create Scratch Org
+        run: |
+          sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.duration_days }} --username --no-namespace  --wait 30 --description ${{ github.event.inputs.description }} --name ${{ github.event.inputs.scratch_name }} --admin-email ${{ github.event.inputs.email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --json --alias ${{ github.event.inputs.scratch_alias }}
+          # sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.duration_days }} --no-namespace --username  ${{ github.event.inputs.username }} --wait 30 --description ${{ github.event.inputs.description }} --name ${{ github.event.inputs.scratch_name }} --admin-email ${{ github.event.inputs.email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --json | $username=jq.result.username --alias ${{ github.event.inputs.scratch_alias }}
+      - name: Generate Pasword
+        run: |
+          sf org generate password --target-org ${{ github.event.inputs.scratch_alias }}
+      - name: Display Scratch Org Details
+        run: |
+          sf org display user --target-org ${{ github.event.inputs.scratch_alias }}
+      
+        
+      
         
