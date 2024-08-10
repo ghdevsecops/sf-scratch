@@ -60,23 +60,26 @@ jobs:
           touch project-snapshot-scratch-def.json
           echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > project-snapshot-scratch-def.json
           cat project-snapshot-scratch-def.json
-          sf org create snapshot --source-org ${{ github.event.inputs.source_org_id }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --name ${{ github.event.inputs.snapshot_name }} --description "${{ github.event.inputs.snapshot_description }}"
+          
           
           #!/bin/bash
           orgGetSnapshotStatus() {
             sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --json | jq -r '.result.Status'
           }
           while true; do
-            getStatus=$(orgGetSnapshotStatus)
-            if ["$getStatus" == "Active"]; then
-              echo "Snapshot Creation: SUCCESS."
-              break
-            elif ["$getStatus" == "Error" || "$getStatus" == "null"]; then
-              echo "Snapshot Creation: FAIL"
-              exit 1
+            getStatus="$(orgGetSnapshotStatus)"
+            if [[ "$getStatus" == "Active" ]]; then
+                echo 'Snapshot Creation: SUCCESS.'
+                break
+            elif [[ "$getStatus" == "Error" || "$getStatus" == "null" ]]; then
+                echo 'Snapshot Creation: FAIL'
+                exit 1
+            elif [[ "$getStatus" == "InProgress" ]]; then
+                echo 'Snapshot Creation: IN PROGRESS'
+                sleep 60
             else
-            echo "Snapshot Creation: IN PROGRESS"
-              sleep 60
+                echo "Can't get Snapshot status"
+                exit 1
             fi
           done
 
