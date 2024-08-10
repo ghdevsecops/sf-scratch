@@ -59,7 +59,7 @@ jobs:
         run: |
           touch project-snapshot-scratch-def.json
           echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > project-snapshot-scratch-def.json
-          cat project-snapshot-scratch-def.json
+          cat config/project-snapshot-scratch-def.json
           
           
           #!/bin/bash
