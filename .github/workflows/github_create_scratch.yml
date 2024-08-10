@@ -24,7 +24,7 @@ on:
           description: Source Org ID
           type: string
         snapshot_name:
-          description: Snapshot Name
+          description: Snapshot Name (Max 15 Char)
           type: string
         snapshot_description:
           description: Snapshot Description

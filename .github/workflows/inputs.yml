@@ -1,0 +1,46 @@
+name: Create Scratch
+on: 
+  workflow_dispatch:
+      inputs:
+        based_on_snapshot:
+          description: Create Scratch based on Snapshot
+          type: choice
+          required: true
+          default: NO
+          options:
+            - YES
+            - NO
+        source_org_id:
+          description: Scratch Org ID
+          type: string
+          required: true
+        snapshot_name:
+          description: Snapshot Name
+          type: string
+          required: true
+        alias:
+          description: Alias
+          required: true
+        email:
+          description: Email
+          required: true
+        description:
+          description: Description
+        duration_days:
+          description: Duration Days
+          type: number
+          default: 30
+          required: true
+        
+jobs:
+  create_scratch:
+    name: Create Scratch
+    runs-on: ubuntu-latest
+    container:
+      image: salesforce/cli:latest-full
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
