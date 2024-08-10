@@ -51,7 +51,7 @@ jobs:
         id: scratch
         if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'false'}}
         run: |
-          sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description ${{ github.event.inputs.scratch_description }} --admin-email ${{ github.event.inputs.scratch_email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --alias ${{ github.event.inputs.scratch_alias }}
+          sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description "${{ github.event.inputs.scratch_description }}" --admin-email ${{ github.event.inputs.scratch_email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --alias ${{ github.event.inputs.scratch_alias }}
       
       - name: Create Scratch Org Based on Snapshot
         id: snapscratch
@@ -62,7 +62,7 @@ jobs:
           cat project-snapshot-scratch-def.json
           sf org create snapshot --source-org ${{ github.event.inputs.source_org_id }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --name ${{ github.event.inputs.snapshot_name }} --description "${{ github.event.inputs.snapshot_description }}"
           sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }}
-          sf org create scratch --set-default --definition-file config/project-snapshot-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description ${{ github.event.inputs.scratch_description }} --admin-email ${{ github.event.inputs.scratch_email }} --alias ${{ github.event.inputs.scratch_alias }}
+          sf org create scratch --set-default --definition-file config/project-snapshot-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description "${{ github.event.inputs.scratch_description }}"" --admin-email ${{ github.event.inputs.scratch_email }} --alias ${{ github.event.inputs.scratch_alias }}
       
       - name: Generate Password & Get Scratch Org Info
         id: genpwd
