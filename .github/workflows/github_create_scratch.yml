@@ -4,9 +4,9 @@ on:
       inputs:
         based_on_snapshot:
           description: Create Scratch Org based on Snapshot
+          required: true
           type: boolean
           default: false
-          required: true
         source_org_id:
           description: Source Org ID
           type: string
@@ -28,7 +28,8 @@ on:
           description: Scratch Description
         scratch_duration_days:
           description: Scratch Duration Days
-          default: '30'
+          type: number
+          default: 30
           required: true
         
 jobs:
