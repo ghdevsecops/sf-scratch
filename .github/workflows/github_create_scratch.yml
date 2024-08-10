@@ -5,8 +5,8 @@ on:
         based_on_snapshot:
           description: Create Scratch Org based on Snapshot
           type: boolean
-          required: true
           default: false
+          required: true
         source_org_id:
           description: Source Org ID
           type: string
