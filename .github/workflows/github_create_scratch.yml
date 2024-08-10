@@ -2,22 +2,38 @@ name: Create Scratch
 on: 
   workflow_dispatch:
       inputs:
-        alias:
-          description: Alias
+        based_on_snapshot:
+          description: Create Scratch Org based on Snapshot
+          type: boolean
           required: true
-        email:
-          description: Email
+          default: false
+        source_org_id:
+          description: Source Org ID
+          type: string
           required: true
-        description:
-          description: Description
-        duration_days:
-          description: Duration Days
+        snapshot_name:
+          description: Snapshot Name
+          type: string
+          required: true
+        snapshot_description:
+          description: Snapshot Description
+          type: string
+        scratch_alias:
+          description: Scratch Alias
+          required: true
+        scratch_email:
+          description: Scratch Email
+          required: true
+        scratch_description:
+          description: Scratch Description
+        scratch_duration_days:
+          description: Scratch Duration Days
           default: '30'
           required: true
         
 jobs:
   create_scratch:
-    name: Create Scratch based on Org Shape
+    name: Create Scratch
     runs-on: ubuntu-latest
     container:
       image: salesforce/cli:latest-full
@@ -26,20 +42,44 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - name: Authorize DevHub
+        id: auth
         run: |
           echo ${{ secrets.SFDX_AUTHURL_PDEVHUB }} | sf org login sfdx-url --sfdx-url-stdin
+          
       - name: Create Scratch Org
+        id: scratch
+        if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'false'}}
         run: |
-          sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.duration_days }}  --wait 30 --description ${{ github.event.inputs.description }} --admin-email ${{ github.event.inputs.email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --alias ${{ github.event.inputs.alias }}
+          sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description ${{ github.event.inputs.scratch_description }} --admin-email ${{ github.event.inputs.scratch_email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --alias ${{ github.event.inputs.scratch_alias }}
+      
+      - name: Create Scratch Org Based on Snapshot
+        id: snapscratch
+        if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'true' && github.event.inputs.source_org_id != '' && github.event.inputs.snapshot_name != '' }}
+        run: |
+          touch project-snapshot-scratch-def.json
+          echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > project-snapshot-scratch-def.json
+          cat project-snapshot-scratch-def.json
+          sf org create snapshot --source-org ${{ github.event.inputs.source_org_id }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --name ${{ github.event.inputs.snapshot_name }} --description "${{ github.event.inputs.snapshot_description }}"
+          sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }}
+          sf org create scratch --set-default --definition-file config/project-snapshot-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description ${{ github.event.inputs.scratch_description }} --admin-email ${{ github.event.inputs.scratch_email }} --alias ${{ github.event.inputs.scratch_alias }}
+      
+      - name: Generate Password & Get Scratch Org Info
+        id: genpwd
+        if: ${{ steps.scratch.outcome == 'success' || steps.snapscratch.outcome == 'success' }}
+        run: | 
           sf org generate password --target-org ${{ github.event.inputs.alias }}
           sf org display user --target-org ${{ github.event.inputs.alias }} | tee -a scratch-org-info.txt
           sf org logout --all --no-prompt
+
       - name: Store Scratch Org Information as Artifact
+        if: ${{ steps.genpwd.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
-          name: Store Scratch Org Info
+          name: Scratch Org Information
           path: scratch-org-info.txt
+  
       
         
       
