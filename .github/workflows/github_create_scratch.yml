@@ -70,7 +70,7 @@ jobs:
           while true; do
             getStatus="$(orgGetSnapshotStatus)"
             echo $getStatus
-            if [ "$getStatus" == "Active" ]; then
+            if [ "$getStatus" = "Active" ]; then
                 echo "Snapshot Creation: SUCCESS."
                 break
             elif [ "$getStatus" = "Error" | "$getStatus" = "null" ]; then
@@ -78,7 +78,7 @@ jobs:
                 exit 1
             elif [ "$getStatus" = "InProgress" ]; then
                 echo "Snapshot Creation: IN PROGRESS"
-                sleep 600
+                sleep 60
             else
                 echo "Can't get Snapshot status"
                 exit 1
