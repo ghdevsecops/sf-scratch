@@ -47,13 +47,13 @@ jobs:
         run: |
           echo ${{ secrets.SFDX_AUTHURL_PDEVHUB }} | sf org login sfdx-url --sfdx-url-stdin
           
-      - name: Create Scratch Org
+      - name: Create New Scratch Org
         id: scratch
         if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'false'}}
         run: |
           sf org create scratch --set-default --definition-file config/project-scratch-def.json --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --no-namespace --duration-days  ${{ github.event.inputs.scratch_duration_days }}  --wait 30 --description "${{ github.event.inputs.scratch_description }}" --admin-email ${{ github.event.inputs.scratch_email }} --source-org ${{ secrets.SFDX_ORGID_PDEVHUB }} --alias ${{ github.event.inputs.scratch_alias }}
       
-      - name: Create Scratch Org Based on Snapshot
+      - name: Create New Scratch Org Based on New Snapshot
         id: snapscratch
         if: ${{ steps.auth.outcome == 'success' && github.event.inputs.based_on_snapshot == 'true' && github.event.inputs.source_org_id != '' && github.event.inputs.snapshot_name != '' }}
         run: |
@@ -61,7 +61,8 @@ jobs:
           echo '{ "orgName":"${{ github.event.inputs.scratch_alias }}", "snapshot":"${{ github.event.inputs.snapshot_name }}" }' > config/project-snapshot-scratch-def.json
           cat config/project-snapshot-scratch-def.json
           
-          
+          sf org create snapshot --source-org ${{ github.event.inputs.source_org_id }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --name ${{ github.event.inputs.snapshot_name }} --description "${{ github.event.inputs.snapshot_description }}"
+
           #!/bin/bash
           orgGetSnapshotStatus() {
             sf org get snapshot --snapshot ${{ github.event.inputs.snapshot_name }} --target-dev-hub ${{ secrets.SFDX_USERNAME_PDEVHUB }} --json | jq -r '.result.Status'
@@ -69,7 +70,7 @@ jobs:
           while true; do
             getStatus="$(orgGetSnapshotStatus)"
             echo $getStatus
-            if [ "$getStatus" = "Active" ]; then
+            if [ "$getStatus" == "Active" ]; then
                 echo "Snapshot Creation: SUCCESS."
                 break
             elif [ "$getStatus" = "Error" | "$getStatus" = "null" ]; then
@@ -77,7 +78,7 @@ jobs:
                 exit 1
             elif [ "$getStatus" = "InProgress" ]; then
                 echo "Snapshot Creation: IN PROGRESS"
-                sleep 60
+                sleep 600
             else
                 echo "Can't get Snapshot status"
                 exit 1
